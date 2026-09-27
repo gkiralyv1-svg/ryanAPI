@@ -45,6 +45,20 @@
 
                 <button type="submit">Keresés</button>
             </form>
+            {% if fares %}
+    <h2>Találatok</h2>
+
+    {% for fare in fares %}
+        {% if not fare.unavailable %}
+            <div>
+                {{ fare.day }}
+                -
+                {{ fare.price.value }}
+                {{ fare.price.currencyCode }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
         </div>
     </div>
 </body>
