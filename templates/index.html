@@ -39,6 +39,7 @@
                         <select
                             id="origin"
                             name="origin"
+                            data-search-origin="{{ selected_origin|default('', true) }}"
                             data-destinations-url="{{ url_for('destinations', origin='__origin__') }}"
                         >
                             {% for city in cities %}
@@ -50,6 +51,11 @@
                                 </option>
                             {% endfor %}
                         </select>
+
+                        <label class="home-city-toggle" for="save-home-city">
+                            <input type="checkbox" id="save-home-city">
+                            <span>{{ t["set_home_city"] }}</span>
+                        </label>
                     </div>
 
                         <button

@@ -1,8 +1,37 @@
 const originSelect = document.getElementById("origin");
 const destinationSelect = document.getElementById("destination");
 const swapButton = document.getElementById("swap-cities");
+const homeCityCheckbox = document.getElementById("save-home-city");
 
 let destinationRequestId = 0;
+
+function isAvailableCity(city) {
+    return Array.from(originSelect.options).some((option) => option.value === city);
+}
+
+function readSavedHomeCity() {
+    try {
+        const savedCity = window.localStorage.getItem("homeCity");
+        if (savedCity && isAvailableCity(savedCity)) {
+            return savedCity;
+        }
+        if (savedCity) {
+            window.localStorage.removeItem("homeCity");
+        }
+    } catch {
+        // Local storage may be disabled; keep using the server default.
+    }
+    return null;
+}
+
+let savedHomeCity = readSavedHomeCity();
+if (!originSelect.dataset.searchOrigin && savedHomeCity) {
+    originSelect.value = savedHomeCity;
+}
+
+function updateHomeCityCheckbox() {
+    homeCityCheckbox.checked = originSelect.value === savedHomeCity;
+}
 
 async function updateDestinations() {
     const requestId = ++destinationRequestId;
@@ -41,7 +70,25 @@ async function updateDestinations() {
     }
 }
 
-originSelect.addEventListener("change", updateDestinations);
+originSelect.addEventListener("change", () => {
+    updateHomeCityCheckbox();
+    updateDestinations();
+});
+
+homeCityCheckbox.addEventListener("change", () => {
+    try {
+        if (homeCityCheckbox.checked) {
+            savedHomeCity = originSelect.value;
+            window.localStorage.setItem("homeCity", savedHomeCity);
+        } else {
+            savedHomeCity = null;
+            window.localStorage.removeItem("homeCity");
+        }
+    } catch {
+        // Keep the current page usable if local storage is unavailable.
+    }
+    updateHomeCityCheckbox();
+});
 
 swapButton.addEventListener("click", () => {
     const originCity = originSelect.value;
@@ -50,4 +97,5 @@ swapButton.addEventListener("click", () => {
     originSelect.dispatchEvent(new Event("change"));
 });
 
+updateHomeCityCheckbox();
 updateDestinations();
