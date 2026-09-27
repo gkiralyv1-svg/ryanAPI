@@ -32,6 +32,33 @@ def get_airports():
     return airports
 
 
+def get_destinations_for_origin(origin_city):
+    airports = get_airports()
+    origin_airports = airports.get(origin_city.lower())
+    if not origin_airports:
+        raise ValueError(f"Unknown origin city: {origin_city}")
+
+    reachable_airports = set()
+    for origin_airport in origin_airports:
+        url = (
+            "https://www.ryanair.com/api/views/locate/"
+            f"searchWidget/routes/en/airport/{origin_airport}"
+        )
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+
+        for route in response.json():
+            arrival_airport = route.get("arrivalAirport", {}).get("code")
+            if arrival_airport:
+                reachable_airports.add(arrival_airport)
+
+    return sorted(
+        city
+        for city, city_airports in airports.items()
+        if any(airport in reachable_airports for airport in city_airports)
+    )
+
+
 def get_ryanair_fares(origin, destination, month, currency="EUR"):
     url = (
         f"https://www.ryanair.com/api/farfnd/v4/"

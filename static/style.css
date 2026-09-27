@@ -29,6 +29,25 @@ body {
     border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
+.language-switcher {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 0.8rem;
+}
+
+.language-switcher a {
+    color: #64748b;
+    text-decoration: none;
+}
+
+.language-switcher a.active {
+    color: #1d4ed8;
+    font-weight: 700;
+}
+
 .card-header {
     text-align: center;
     margin-bottom: 24px;
@@ -42,14 +61,14 @@ body {
 }
 
 h1 {
-    margin: 0;
+    margin: 0 0 16px;
     color: #0f172a;
     font-size: clamp(1.9rem, 2.2vw, 2.5rem);
     letter-spacing: -0.03em;
 }
 
 .subtitle {
-    margin: 8px 0 0;
+    margin: 8px 0 24px;
     color: #64748b;
     font-size: 0.95rem;
 }
@@ -58,6 +77,13 @@ form {
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: end;
+    gap: 12px;
 }
 
 .field-group {
@@ -73,7 +99,9 @@ label {
     font-size: 0.95rem;
 }
 
-select {
+select,
+input[type="month"],
+input[type="text"] {
     width: 100%;
     padding: 0.9rem 0.9rem;
     border: 1px solid #cbd5e1;
@@ -84,7 +112,9 @@ select {
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-select:focus {
+select:focus,
+input[type="month"]:focus,
+input[type="text"]:focus {
     outline: none;
     border-color: #60a5fa;
     box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
@@ -108,6 +138,33 @@ button:hover {
     transform: translateY(-1px);
 }
 
+.swap-button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    box-shadow: none;
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+.swap-button:hover {
+    background: #dbeafe;
+}
+
+.error-message {
+    margin: 16px 0 0;
+    padding: 12px 14px;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    background: #fef2f2;
+    color: #991b1b;
+    overflow-wrap: anywhere;
+}
+
 @media (max-width: 540px) {
     body {
         padding: 16px;
@@ -121,5 +178,155 @@ button:hover {
 
     .subtitle {
         font-size: 0.85rem;
+    }
+
+    .form-row {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .swap-button {
+        justify-self: center;
+        transform: rotate(90deg);
+    }
+
+    .swap-button:hover {
+        transform: rotate(90deg) translateY(-1px);
+    }
+}
+.results {
+    margin-top: 20px;
+    border: 1px solid #e0e4e8;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.result-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 18px;
+    background: white;
+    border-bottom: 1px solid #eaecef;
+}
+
+.result-row:last-child {
+    border-bottom: none;
+}
+
+.result-date {
+    font-weight: bold;
+}
+
+.result-time {
+    color: #555;
+}
+
+.result-price {
+    font-weight: bold;
+    font-size: 18px;
+    text-align: right;
+}
+
+@media (max-width: 600px) {
+    .result-row {
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+    }
+
+    .result-time {
+        grid-column: 1;
+    }
+
+    .result-price {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-self: center;
+    }
+}
+
+.reset-button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: white;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+}
+
+.reset-button:hover {
+    background: #f5f7fa;
+}
+h2 {
+    margin-top: 35px;
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+.results {
+    border: 1px solid #e1e5e9;
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+}
+
+.result-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 18px;
+    border-bottom: 1px solid #edf0f2;
+}
+
+.result-row:last-child {
+    border-bottom: none;
+}
+
+.result-row:hover {
+    background: #f8fafc;
+}
+
+.result-date {
+    font-weight: 600;
+}
+
+.result-time {
+    color: #555;
+    font-size: 15px;
+}
+
+.result-price {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: right;
+}
+
+@media (max-width: 600px) {
+
+    .result-row {
+        grid-template-columns: 1fr auto;
+        gap: 6px 12px;
+        padding: 14px 16px;
+    }
+
+    .result-date {
+        grid-column: 1;
+    }
+
+    .result-time {
+        grid-column: 1;
+    }
+
+    .result-price {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-self: center;
     }
 }

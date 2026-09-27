@@ -1,65 +1,190 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="{{ language }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Ryanair Finder</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head>
+
 <body>
-    <div class="page-shell">
+
+    <div class="container">
+
         <div class="card">
-            <div class="card-header">
-                <div class="airplane-icon" aria-hidden="true">✈</div>
-                <h1>Ryanair Finder</h1>
-                <p class="subtitle">Keress olcsó járatokat a Ryanair hálózatában</p>
-            </div>
+
+            <nav class="language-switcher" aria-label="{{ t['language'] }}">
+                <a href="{{ url_for('set_language', language='hu') }}" {% if language == 'hu' %}class="active" aria-current="page"{% endif %}>HU</a>
+                <span aria-hidden="true">|</span>
+                <a href="{{ url_for('set_language', language='en') }}" {% if language == 'en' %}class="active" aria-current="page"{% endif %}>EN</a>
+            </nav>
+
+            <h1>✈ Ryanair Finder</h1>
+
+            <p class="subtitle">
+                {{ t["subtitle"] }}
+            </p>
 
             <form method="POST" action="/search">
-                <div class="field-group">
-                    <label for="origin">Indulás:</label>
-                    <select id="origin" name="origin">
-                        {% for city in cities %}
-                            <option value="{{ city }}">{{ city|capitalize }}</option>
+
+                <div class="form-row">
+
+                    <div class="field">
+                        <label for="origin">{{ t["origin"] }}</label>
+
+                        <select
+                            id="origin"
+                            name="origin"
+                            data-destinations-url="{{ url_for('destinations', origin='__origin__') }}"
+                        >
+                            {% for city in cities %}
+                                <option
+                                    value="{{ city }}"
+                                    {% if city == (selected_origin|default(home_city, true)) %}selected{% endif %}
+                                >
+                                    {{ city|capitalize }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                        <button
+                            class="swap-button"
+                            id="swap-cities"
+                            type="button"
+                            aria-label="{{ t['swap_cities'] }}"
+                            title="{{ t['swap_cities'] }}"
+                        >
+                            <span aria-hidden="true">⇄</span>
+                        </button>
+
+                    <div class="field">
+                        <label for="destination">{{ t["destination"] }}</label>
+
+                        <select id="destination" name="destination">
+
+                            {% for city in cities %}
+                                <option
+                                    value="{{ city }}"
+                                    {% if city == selected_destination %}selected{% endif %}
+                                >
+                                    {{ city|capitalize }}
+                                </option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+
+                </div>
+
+
+                <div class="field month">
+
+                    <label for="month">{{ t["month"] }}</label>
+
+                    <select id="month" name="month" required>
+                        <option value="" disabled {% if not selected_month %}selected{% endif %}>
+                            {{ t["select_month"] }}
+                        </option>
+                        {% for month_option in month_options %}
+                            <option
+                                value="{{ month_option.value }}"
+                                {% if month_option.value == selected_month %}selected{% endif %}
+                            >
+                                {{ t["month_label"].format(month=t["months"][month_option.month - 1], year=month_option.year) }}
+                            </option>
                         {% endfor %}
                     </select>
+
                 </div>
 
-                <div class="field-group">
-                    <label for="destination">Érkezés:</label>
-                    <select id="destination" name="destination">
-                        {% for city in cities %}
-                            <option value="{{ city }}">{{ city|capitalize }}</option>
-                        {% endfor %}
+                <div class="field month">
+
+                    <label for="currency">{{ t["currency"] }}</label>
+
+                    <select id="currency" name="currency">
+                        <option value="EUR" {% if selected_currency == "EUR" %}selected{% endif %}>EUR</option>
+                        <option value="HUF" {% if selected_currency == "HUF" %}selected{% endif %}>HUF</option>
                     </select>
+
                 </div>
 
-                <div class="field-group">
-                    <label for="month">Hónap:</label>
-                    <select id="month" name="month">
-                        <option value="2026-10">2026-10</option>
-                        <option value="2026-11">2026-11</option>
-                        <option value="2026-12">2026-12</option>
-                    </select>
+                <div class="field month">
+
+                    <label for="max-price">{{ t["max_price"] }}</label>
+
+                    <input
+                        type="text"
+                        id="max-price"
+                        name="max_price"
+                        value="{{ selected_max_price }}"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        title="{{ t['max_price_input_title'] }}"
+                    >
+
                 </div>
 
-                <button type="submit">Keresés</button>
+
+                <button type="submit">
+                    {{ t["search"] }}
+                </button>
+
+                <a href="{{ url_for('index') }}" class="reset-button">
+                    {{ t["new_search"] }}
+                </a>
+
             </form>
-            {% if fares %}
-    <h2>Találatok</h2>
 
-    {% for fare in fares %}
-        {% if not fare.unavailable %}
-            <div>
-                {{ fare.day }}
-                -
-                {{ fare.price.value }}
-                {{ fare.price.currencyCode }}
-            </div>
-        {% endif %}
-    {% endfor %}
-{% endif %}
+            {% if error %}
+                <p class="error-message" role="alert">{{ error }}</p>
+            {% endif %}
+
+            {% if fares %}
+
+                <h2>{{ t["results"] }}</h2>
+
+                <div class="results">
+
+                    {% for fare in fares %}
+
+                        {% if not fare.unavailable %}
+
+                            <div class="result-row">
+
+                                <div class="result-date">
+                                    {{ fare.day }}
+                                </div>
+
+                                <div class="result-time">
+                                    {{ fare.departureDate[11:16] }}
+                                    →
+                                    {{ fare.arrivalDate[11:16] }}
+                                </div>
+
+                                <div class="result-price">
+                                    {{ "{:,.2f}".format(fare.price.value) }}
+                                    {{ fare.price.currencyCode }}
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
         </div>
+
     </div>
+
 </body>
+
 </html>
