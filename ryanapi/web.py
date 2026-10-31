@@ -118,11 +118,8 @@ def search():
 
     airports = get_airports()
 
-    origin_airports = airports[origin]
-    destination_airports = airports[destination]
-
     error = None
-    fares = []
+    fare_directions = []
     max_price = None
     t = TRANSLATIONS[current_language()]
     if currency not in {"EUR", "HUF"}:
@@ -135,33 +132,41 @@ def search():
         if max_price_text:
             max_price = int(max_price_text)
 
-        try:
-            data = get_ryanair_fares(
-                origin=origin_airports[0],
-                destination=destination_airports[0],
-                month=month + "-01",
-                currency=currency,
-            )
-            fares = data.get("outbound", {}).get("fares", [])
-            if max_price is not None:
-                fares = [
-                    fare
-                    for fare in fares
-                    if fare.get("unavailable")
-                    or Decimal(str(fare["price"]["value"])) <= max_price
-                ]
-        except HTTPError as exc:
-            response = exc.response
-            status = response.status_code if response is not None else "unknown"
-            details = response.text.strip()[:300] if response is not None else str(exc)
-            error = t["error_api"].format(status=status, details=details)
-
-    print(fares)
+        for direction_origin, direction_destination in (
+            (origin, destination),
+            (destination, origin),
+        ):
+            try:
+                data = get_ryanair_fares(
+                    origin=airports[direction_origin][0],
+                    destination=airports[direction_destination][0],
+                    month=month + "-01",
+                    currency=currency,
+                )
+                fares = data.get("outbound", {}).get("fares", [])
+                if max_price is not None:
+                    fares = [
+                        fare
+                        for fare in fares
+                        if fare.get("unavailable")
+                        or Decimal(str(fare["price"]["value"])) <= max_price
+                    ]
+                if fares:
+                    fare_directions.append({
+                        "origin": direction_origin,
+                        "destination": direction_destination,
+                        "fares": fares,
+                    })
+            except HTTPError as exc:
+                response = exc.response
+                status = response.status_code if response is not None else "unknown"
+                details = response.text.strip()[:300] if response is not None else str(exc)
+                error = t["error_api"].format(status=status, details=details)
 
     return render_template(
         "index.html",
         cities=sorted(airports.keys()),
-        fares=fares,
+        fare_directions=fare_directions,
         selected_origin=origin,
         selected_destination=destination,
         selected_month=month,

@@ -150,40 +150,46 @@
                 <p class="error-message" role="alert">{{ error }}</p>
             {% endif %}
 
-            {% if fares %}
+            {% if fare_directions %}
 
                 <h2>{{ t["results"] }}</h2>
 
-                <div class="results">
+                {% for direction in fare_directions %}
 
-                    {% for fare in fares %}
+                    <section class="direction-results">
+                        <h3>{{ direction.origin|capitalize }} → {{ direction.destination|capitalize }}</h3>
+                        <div class="results">
 
-                        {% if not fare.unavailable %}
+                            {% for fare in direction.fares %}
 
-                            <div class="result-row">
+                                {% if not fare.unavailable %}
 
-                                <div class="result-date">
-                                    {{ fare.day }}
-                                </div>
+                                    <div class="result-row">
 
-                                <div class="result-time">
-                                    {{ fare.departureDate[11:16] }}
-                                    →
-                                    {{ fare.arrivalDate[11:16] }}
-                                </div>
+                                        <div class="result-date">
+                                            {{ fare.day }}
+                                        </div>
 
-                                <div class="result-price">
-                                    {{ "{:,.2f}".format(fare.price.value) }}
-                                    {{ fare.price.currencyCode }}
-                                </div>
+                                        <div class="result-time">
+                                            {{ fare.departureDate[11:16] }}
+                                            →
+                                            {{ fare.arrivalDate[11:16] }}
+                                        </div>
 
-                            </div>
+                                        <div class="result-price">
+                                            {{ "{:,.2f}".format(fare.price.value) }}
+                                            {{ fare.price.currencyCode }}
+                                        </div>
 
-                        {% endif %}
+                                    </div>
 
-                    {% endfor %}
+                                {% endif %}
 
-                </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+
+                {% endfor %}
 
             {% endif %}
 
