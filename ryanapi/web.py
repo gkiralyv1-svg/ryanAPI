@@ -8,6 +8,9 @@ from requests.exceptions import HTTPError, RequestException
 from .cli import get_airports, get_destinations_for_origin, get_ryanair_fares
 from .config import HOME_CITY
 from .translations import TRANSLATIONS
+from breezehunt.forecast import get_forecasts, build_daily_summary
+
+
 
 
 
@@ -90,6 +93,25 @@ def destinations(origin):
         return jsonify({"error": "Unknown origin city"}), 404
     except RequestException:
         return jsonify({"error": "Route lookup unavailable"}), 502
+
+
+@app.route("/breezehunt")
+def breezehunt():
+    try:
+        forecasts = get_forecasts()
+        daily_summary = build_daily_summary(forecasts)
+        error = None
+    except RequestException:
+        forecasts = []
+        daily_summary = []
+        error = "Unable to retrieve the latest forecast."
+
+    return render_template(
+        "breezehunt.html",
+        forecasts=forecasts,
+        daily_summary=daily_summary,
+        error=error,
+    )
 
 
 @app.route("/")
