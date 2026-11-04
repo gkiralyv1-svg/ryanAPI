@@ -51,13 +51,29 @@
                 <div class="hero-overlay">
                     <h2>
                         {% if language == 'hu' %}
-
+                            Ne maradj le az óriáshullámokról!
                         {% else %}
-
+                            CHASE THE GIANT WAVES.
                         {% endif %}
                     </h2>
 
-                    <p>Nazaré, Portugal</p>
+                    <p>
+                        {% if language == 'hu' %}
+                            Tervezd az utazásodat a hullámokhoz!
+                        {% else %}
+                            Don't just visit Nazaré. Time your visit.
+                        {% endif %}
+                    </p>
+
+                    <div class="hero-description">
+                        {% if language == 'hu' %}
+                            A Breezehunt segít megtalálni a legígéretesebb napokat,
+                            amikor Nazaréban a legnagyobb hullámok érkezhetnek.
+                        {% else %}
+                            Breezehunt helps you find the most promising days
+                            to witness giant waves in Nazaré, Portugal.
+                        {% endif %}
+                    </div>
                 </div>
 
             </div>
