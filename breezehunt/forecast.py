@@ -1,6 +1,10 @@
+import logging
+
 import requests
 
 from breezehunt.scoring import classify_swell
+
+logger = logging.getLogger(__name__)
 
 
 # Open-Meteo API endpoints
@@ -66,6 +70,13 @@ def get_weather_forecast():
         params=params,
         timeout=30,
     )
+    if response.status_code == 429:
+        logger.error(
+            "Open-Meteo Weather API rate limit: status=%s, response=%s",
+            response.status_code,
+            response.text,
+        )
+
     response.raise_for_status()
 
     return response.json()
