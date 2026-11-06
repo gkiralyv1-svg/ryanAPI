@@ -101,7 +101,8 @@ def breezehunt():
         forecasts = get_forecasts()
         daily_summary = build_daily_summary(forecasts)
         error = None
-    except RequestException:
+    except RequestException as exc:
+        app.logger.exception("Breezehunt forecast request failed")
         forecasts = []
         daily_summary = []
         error = "Unable to retrieve the latest forecast."
