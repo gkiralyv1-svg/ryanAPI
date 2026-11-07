@@ -80,6 +80,33 @@
 
         </section>
 
+        <section class="webcam-section">
+            <h2>
+                {% if language == 'hu' %}
+                    🔴 Élő webkamera – Nazaré
+                {% else %}
+                    🔴 Live Webcam – Nazaré
+                {% endif %}
+            </h2>
+
+            <p>
+                {% if language == 'hu' %}
+                    Nézd meg az aktuális óceáni viszonyokat élőben!
+                {% else %}
+                    Check the current ocean conditions live!
+                {% endif %}
+            </p>
+
+            <div class="webcam-video">
+                <iframe
+                    src="https://www.youtube-nocookie.com/embed/_Gi8UC_HPKM?rel=0&playsinline=1"
+                    title="{% if language == 'hu' %}Élő nazaréi webkamera{% else %}Live Nazaré webcam{% endif %}"
+                    loading="lazy"
+                    referrerpolicy="strict-origin-when-cross-origin">
+                </iframe>
+            </div>
+        </section>
+
         <section class="condition-info swell-info">
 
             <h2>
