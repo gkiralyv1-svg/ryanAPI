@@ -7,9 +7,13 @@ from breezehunt.scoring import classify_swell
 logger = logging.getLogger(__name__)
 
 
-# Open-Meteo API endpoints
-MARINE_API_URL = "https://marine-api.open-meteo.com/v1/marine"
-WEATHER_API_URL = "https://api.open-meteo.com/v1/forecast"
+# Cloudflare Worker API endpoints
+MARINE_API_URL = (
+    "https://crimson-water-c03b.gkiralyv1.workers.dev/marine"
+)
+WEATHER_API_URL = (
+    "https://crimson-water-c03b.gkiralyv1.workers.dev/weather"
+)
 
 # Nazaré coordinates
 LATITUDE = 39.6115
